@@ -6,7 +6,7 @@ pipeline{
             steps{
                 nodejs("nextjs-jenkins") {
                     sh 'npm install'
-                    sh 'npm build'
+                    sh 'npm run build'
                 }
             }
         }
