@@ -71,15 +71,15 @@ pipeline {
     }
 
     tools {
-        nodejs 'nextjs-jenkins'
+        nodejs 'nextjs-jenkins' // Make sure this is configured in Jenkins Tools
     }
 
     stages {
-        // stage('Checkout') {
-        //     steps {
-        //         git 'https://github.com/yazilansari/nextjs-jenkins.git'
-        //     }
-        // }
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/yazilansari/nextjs-jenkins.git'
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
@@ -89,10 +89,14 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+        stage('Run Next.js Container') {
             steps {
                 script {
-                    dockerImage.run('-p 3000:3000')
+                    // Clean up old container if exists
+                    sh 'docker rm -f nextjs-container || true'
+
+                    // Run the new container on port 3000
+                    dockerImage.run("-d -p 3000:3000 --name nextjs-container")
                 }
             }
         }
