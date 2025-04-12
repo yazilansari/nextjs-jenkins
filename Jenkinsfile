@@ -1,22 +1,64 @@
-pipeline{
+pipeline {
     agent any
-    tools {nodejs "nextjs-jenkins"}
-    stages{
-        stage("Build"){
-            steps{
-                nodejs("nextjs-jenkins") {
-                    sh 'npm install'
-                    sh 'npm run build'
-                }
+
+    environment {
+        NODE_ENV = 'production'
+    }
+
+    tools {
+        nodejs 'NodeJS_20' // Make sure NodeJS is installed in Jenkins global tools config
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your/repo.git'
             }
         }
-        stage("Start"){
-            steps{
-                nodejs("nextjs-jenkins") {
-                    sh 'npm start'
-                }
-                echo "App started successfully"
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
             }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+        }
+
+        // Optional: Linting
+        // stage('Lint') {
+        //     steps {
+        //         sh 'npm run lint'
+        //     }
+        // }
+
+        // Optional: Deployment
+        // stage('Deploy') {
+        //     when {
+        //         branch 'main'
+        //     }
+        //     steps {
+        //         // Replace with your deployment logic
+        //         sh 'npm run deploy'
+        //     }
+        // }
+    }
+
+    post {
+        always {
+            echo 'Pipeline complete'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
