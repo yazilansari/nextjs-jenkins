@@ -6,7 +6,7 @@ pipeline {
     }
 
     tools {
-        nodejs 'NodeJS_20' // Make sure NodeJS is installed in Jenkins global tools config
+        nodejs 'nextjs-jenkins' // Make sure NodeJS is installed in Jenkins global tools config
     }
 
     stages {
