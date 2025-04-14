@@ -10,11 +10,11 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/yazilansari/nextjs-jenkins.git'
-            }
-        }
+        // stage('Checkout') {
+        //     steps {
+        //         git 'https://github.com/yazilansari/nextjs-jenkins.git'
+        //     }
+        // }
 
         stage('Install Dependencies') {
             steps {
