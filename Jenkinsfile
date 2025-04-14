@@ -19,7 +19,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
-                sh 'npm install pm2 -g' // Install PM2 globally
+                // sh 'npm install pm2 -g' // Install PM2 globally
             }
         }
 
@@ -32,8 +32,9 @@ pipeline {
         stage('Start with PM2') {
             steps {
                 // Ensure you have a suitable start script in package.json (e.g., "start": "next start")
-                sh 'pm2 delete nextjs-app || true' // Delete existing process if exists
-                sh 'pm2 start npm --name "nextjs-app" -- run start' // Run Next.js with PM2
+                // sh 'pm2 delete nextjs-app || true' // Delete existing process if exists
+                // sh 'pm2 start npm --name "nextjs-app" -- run start' // Run Next.js with PM2
+                sh 'bash /usr/local/bin/run-app.sh'
             }
         }
     }
