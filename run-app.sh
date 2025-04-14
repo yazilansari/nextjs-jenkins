@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /path/to/your/nextjs-jenkins
+#cd /path/to/your/nextjs-jenkins
 
 # Clean previous process (if any)
 pm2 delete nextjs-app || true
