@@ -1,22 +1,6 @@
-# Dockerfile
-
-FROM node:20-alpine AS base
-
-# Create app directory
-WORKDIR /app
-
-# Install app dependencies
-COPY package*.json ./
-RUN npm install
-
-# Copy app source
-COPY . .
-
-# Build Next.js app
-RUN npm run build
-
-# Expose the port Next.js runs on
-EXPOSE 3000
-
-# Start the app
-CMD ["npm", "start"]
+FROM jenkins/jenkins:lts
+USER root
+RUN apt-get update && \
+    apt-get install -y docker.io && \
+    apt-get clean
+USER jenkins
