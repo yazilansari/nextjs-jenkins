@@ -103,7 +103,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/yazilansari/nextjs-jenkins.git', branch: 'main'
+                git url: 'https://github.com/yazilansari/nextjs-jenkins.git', branch: 'master'
             }
         }
         stage('Build Docker Image') {
