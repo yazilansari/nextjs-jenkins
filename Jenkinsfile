@@ -114,23 +114,30 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("nextjs-jenkins-app:${env.BUILD_ID}")
+                    dockerImage = docker.build("nextjs-jenkins-app:2")
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    sh 'docker stop nextjs-jenkins-app || true'
-                    sh 'docker rm nextjs-jenkins-app || true'
-                    sh 'docker run -d --name nextjs-jenkins-app -p 3000:3000 nextjs-jenkins-app:${env.BUILD_ID}'
+                    sh label: 'Stop and remove existing container', script: '''
+                        /bin/bash -c "docker stop nextjs-jenkins-app || true"
+                        /bin/bash -c "docker rm nextjs-jenkins-app || true"
+                    '''
+                    sh label: 'Run new container', script: '''
+                        /bin/bash -c "docker run -d --name nextjs-jenkins-app -p 3000:3000 nextjs-jenkins-app:2"
+                        /bin/bash -c "docker ps -a"
+                    '''
                 }
             }
         }
     }
     post {
         always {
-            sh 'docker rmi nextjs-jenkins-app:${env.BUILD_ID} || true'
+            sh label: 'Clean up Docker image', script: '''
+                /bin/bash -c "docker rmi nextjs-jenkins-app:2 || true"
+            '''
         }
     }
 }
