@@ -1,53 +1,53 @@
-pipeline {
-    agent any
+// pipeline {
+//     agent any
 
-    environment {
-        NODE_ENV = 'production'
-    }
+//     environment {
+//         NODE_ENV = 'production'
+//     }
 
-    tools {
-        nodejs 'nextjs-jenkins' // Make sure NodeJS is installed in Jenkins global tools config
-    }
+//     tools {
+//         nodejs 'nextjs-jenkins' // Make sure NodeJS is installed in Jenkins global tools config
+//     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/yazilansari/nextjs-jenkins.git'
-            }
-        }
+//     stages {
+//         stage('Checkout') {
+//             steps {
+//                 git 'https://github.com/yazilansari/nextjs-jenkins.git'
+//             }
+//         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-                // sh 'npm install pm2 -g' // Install PM2 globally
-            }
-        }
+//         stage('Install Dependencies') {
+//             steps {
+//                 sh 'npm install'
+//                 // sh 'npm install pm2 -g' // Install PM2 globally
+//             }
+//         }
 
-        stage('Build') {
-            steps {
-                sh 'npm run build'
-            }
-        }
+//         stage('Build') {
+//             steps {
+//                 sh 'npm run build'
+//             }
+//         }
         
-        stage('Start with PM2') {
-            steps {
-                // Ensure you have a suitable start script in package.json (e.g., "start": "next start")
-                // sh 'pm2 delete nextjs-app || true' // Delete existing process if exists
-                // sh 'pm2 start npm --name "nextjs-app" -- run start' // Run Next.js with PM2
-                sh 'bash /usr/local/bin/run-app.sh'
-            }
-        }
-    }
+//         stage('Start with PM2') {
+//             steps {
+//                 // Ensure you have a suitable start script in package.json (e.g., "start": "next start")
+//                 // sh 'pm2 delete nextjs-app || true' // Delete existing process if exists
+//                 // sh 'pm2 start npm --name "nextjs-app" -- run start' // Run Next.js with PM2
+//                 sh 'bash /usr/local/bin/run-app.sh'
+//             }
+//         }
+//     }
 
-    post {
-        always {
-            echo 'Pipeline complete'
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
-    }
-}
+//     post {
+//         always {
+//             echo 'Pipeline complete'
+//         }
+//         failure {
+//             echo 'Pipeline failed!'
+//         }
+//     }
+// }
 
 // pipeline {
 //     agent any
@@ -97,3 +97,35 @@ pipeline {
 //         }
 //     }
 // }
+
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/yazilansari/nextjs-jenkins.git', branch: 'main'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("nextjs-jenkins-app:${env.BUILD_ID}")
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    sh 'docker stop nextjs-jenkins-app || true'
+                    sh 'docker rm nextjs-jenkins-app || true'
+                    sh 'docker run -d --name nextjs-jenkins-app -p 3000:3000 nextjs-jenkins-app:${env.BUILD_ID}'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            sh 'docker rmi nextjs-jenkins-app:${env.BUILD_ID} || true'
+        }
+    }
+}
