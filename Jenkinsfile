@@ -156,8 +156,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/yazilansari/nextjs-jenkins.git', 
-                    branch: 'master', 
-                    credentialsId: 'github-credentials'
+                    branch: 'master'
+                    // , credentialsId: 'github-credentials'
             }
         }
         stage('Build Docker Image') {
@@ -194,6 +194,7 @@ pipeline {
             sh label: 'Clean up Docker image', script: '''
                 /bin/sh -c "docker rmi nextjs-jenkins-app:2 || true"
             '''
+            echo 'Pipeline completed. Triggered by: ${BUILD_CAUSE}'
         }
     }
 }
