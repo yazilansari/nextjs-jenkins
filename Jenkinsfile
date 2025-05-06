@@ -195,11 +195,4 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            sh label: 'Clean up Docker image', script: '''
-                /bin/sh -c "docker rmi nextjs-jenkins-app || true"
-            '''
-        }
-    }
 }
