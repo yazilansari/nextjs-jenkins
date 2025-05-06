@@ -98,6 +98,50 @@
 //     }
 // }
 
+// pipeline {
+//     agent {
+//         docker {
+//             image 'docker:20.10'
+//             args '-v /var/run/docker.sock:/var/run/docker.sock'
+//         }
+//     }
+//     stages {
+//         stage('Checkout') {
+//             steps {
+//                 git url: 'https://github.com/yazilansari/nextjs-jenkins.git', branch: 'master'
+//             }
+//         }
+//         stage('Build Docker Image') {
+//             steps {
+//                 script {
+//                     dockerImage = docker.build("nextjs-jenkins-app:2")
+//                 }
+//             }
+//         }
+//         stage('Deploy') {
+//             steps {
+//                 script {
+//                     sh label: 'Stop and remove existing container', script: '''
+//                         /bin/sh -c "docker stop nextjs-jenkins-app || true"
+//                         /bin/sh -c "docker rm nextjs-jenkins-app || true"
+//                     '''
+//                     sh label: 'Run new container', script: '''
+//                         /bin/sh -c "docker run -d --name nextjs-jenkins-app -p 3000:3000 nextjs-jenkins-app:2"
+//                         /bin/sh -c "docker ps -a"
+//                     '''
+//                 }
+//             }
+//         }
+//     }
+//     post {
+//         always {
+//             sh label: 'Clean up Docker image', script: '''
+//                 /bin/sh -c "docker rmi nextjs-jenkins-app:2 || true"
+//             '''
+//         }
+//     }
+// }
+
 pipeline {
     agent {
         docker {
@@ -108,7 +152,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/yazilansari/nextjs-jenkins.git', branch: 'master'
+                git url: 'https://github.com/yazilansari/nextjs-jenkins.git', 
+                    branch: 'master', 
+                    credentialsId: 'github-credentials'
             }
         }
         stage('Build Docker Image') {
@@ -130,6 +176,13 @@ pipeline {
                         /bin/sh -c "docker ps -a"
                     '''
                 }
+            }
+        }
+        stage('Verify') {
+            steps {
+                sh label: 'Verify container status', script: '''
+                    /bin/sh -c "docker inspect nextjs-jenkins-app"
+                '''
             }
         }
     }
