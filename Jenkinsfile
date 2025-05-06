@@ -122,12 +122,12 @@ pipeline {
             steps {
                 script {
                     sh label: 'Stop and remove existing container', script: '''
-                        /bin/bash -c "docker stop nextjs-jenkins-app || true"
-                        /bin/bash -c "docker rm nextjs-jenkins-app || true"
+                        /bin/sh -c "docker stop nextjs-jenkins-app || true"
+                        /bin/sh -c "docker rm nextjs-jenkins-app || true"
                     '''
                     sh label: 'Run new container', script: '''
-                        /bin/bash -c "docker run -d --name nextjs-jenkins-app -p 3000:3000 nextjs-jenkins-app:2"
-                        /bin/bash -c "docker ps -a"
+                        /bin/sh -c "docker run -d --name nextjs-jenkins-app -p 3000:3000 nextjs-jenkins-app:2"
+                        /bin/sh -c "docker ps -a"
                     '''
                 }
             }
@@ -136,7 +136,7 @@ pipeline {
     post {
         always {
             sh label: 'Clean up Docker image', script: '''
-                /bin/bash -c "docker rmi nextjs-jenkins-app:2 || true"
+                /bin/sh -c "docker rmi nextjs-jenkins-app:2 || true"
             '''
         }
     }
