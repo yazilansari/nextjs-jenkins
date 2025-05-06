@@ -195,14 +195,14 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            sh label: 'Clean up container and image', script: '''
-                /bin/sh -c "docker stop nextjs-jenkins-app || true"
-                /bin/sh -c "docker rm nextjs-jenkins-app || true"
-                /bin/sh -c "docker rmi nextjs-jenkins-app || true"
-            '''
-            echo "Pipeline completed. Triggered by: ${currentBuild.getBuildCauses().collect { it.shortDescription }.join(', ')}"
-        }
-    }
+    // post {
+    //     always {
+    //         sh label: 'Clean up container and image', script: '''
+    //             /bin/sh -c "docker stop nextjs-jenkins-app || true"
+    //             /bin/sh -c "docker rm nextjs-jenkins-app || true"
+    //             /bin/sh -c "docker rmi nextjs-jenkins-app || true"
+    //         '''
+    //         echo "Pipeline completed. Triggered by: ${currentBuild.getBuildCauses().collect { it.shortDescription }.join(', ')}"
+    //     }
+    // }
 }
