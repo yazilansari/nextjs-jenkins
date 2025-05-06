@@ -153,16 +153,23 @@ pipeline {
         githubPush()
     }
     stages {
+        stage('Webhook Debug') {
+            steps {
+                echo "Webhook received for branch: ${env.GIT_BRANCH}"
+                echo "Commit: ${env.GIT_COMMIT}"
+            }
+        }
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/yazilansari/nextjs-jenkins.git', 
-                    branch: 'master', credentialsId: 'github-credentials'
+                    branch: 'master', 
+                    credentialsId: 'github-credentials'
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("nextjs-jenkins-app:2")
+                    dockerImage = docker.build("nextjs-jenkins-app")
                 }
             }
         }
@@ -174,7 +181,7 @@ pipeline {
                         /bin/sh -c "docker rm nextjs-jenkins-app || true"
                     '''
                     sh label: 'Run new container', script: '''
-                        /bin/sh -c "docker run -d --name nextjs-jenkins-app -p 3000:3000 nextjs-jenkins-app:2"
+                        /bin/sh -c "docker run -d --name nextjs-jenkins-app -p 3000:3000 nextjs-jenkins-app"
                         /bin/sh -c "docker ps -a"
                     '''
                 }
@@ -190,11 +197,16 @@ pipeline {
     }
     post {
         always {
-            sh label: 'Clean up Docker image', script: '''
-                /bin/sh -c "docker rmi nextjs-jenkins-app:2 || true"
+            sh label: 'Clean up container and image', script: '''
+                /bin/sh -c "docker stop nextjs-jenkins-app || true"
+                /bin/sh -c "docker rm nextjs-jenkins-app || true"
+                /bin/sh -c "docker rmi nextjs-jenkins-app || true"
             '''
-            echo "Pipeline completed. Triggered by: ${BUILD_CAUSE}"
-            echo "GitHub Webhook Details: ${currentBuild.rawBuild.getCause(hudson.triggers.SCMTrigger$SCMTriggerCause)?.shortDescription}" 
+            script {
+                def causes = currentBuild.rawBuild.getCauses()
+                echo "Pipeline completed. Triggered by: ${causes.collect { it.getShortDescription() }.join(', ')}"
+            }
+            echo "GitHub Webhook Details: ${currentBuild.rawBuild.getCause(hudson.triggers.SCMTrigger$SCMTriggerCause)?.shortDescription}"
         }
     }
 }
