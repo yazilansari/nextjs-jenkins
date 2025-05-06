@@ -195,7 +195,7 @@ pipeline {
             }
         }
          post {
-        always {
+        always { 
             echo "Pipeline completed. Triggered by: ${currentBuild.getBuildCauses().collect { it.shortDescription }.join(', ')}"
         }
     }
