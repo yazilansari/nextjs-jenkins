@@ -157,7 +157,7 @@ pipeline {
             steps {
                 git url: 'https://github.com/yazilansari/nextjs-jenkins.git', 
                     branch: 'master', 
-                    credentialsId: 'github-credentials'
+                    // credentialsId: 'github-credentials'
             }
         }
         stage('Build Docker Image') {
