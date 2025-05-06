@@ -195,7 +195,7 @@ pipeline {
                 /bin/sh -c "docker rmi nextjs-jenkins-app:2 || true"
             '''
             echo "Pipeline completed. Triggered by: ${BUILD_CAUSE}"
-            echo "GitHub Webhook Details: ${currentBuild.rawBuild.getCause(hudson.triggers.SCMTrigger$SCMTriggerCause)?.shortDescription}"
+            echo "GitHub Webhook Details: ${currentBuild.rawBuild.getCause(hudson.triggers.SCMTrigger$SCMTriggerCause)?.shortDescription}" 
         }
     }
 }
