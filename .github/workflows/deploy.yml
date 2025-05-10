@@ -1,0 +1,61 @@
+name: Deploy to Cloudways
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Node.js
+      #   - Ascertain
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      # Build Next.js app
+      - name: Build Next.js app
+        # env:
+        #   NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+        #   DB_URI: ${{ secrets.DB_URI }}
+        run: npm run build
+
+      # Copy files to Cloudways server
+      - name: Copy files to server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          APP_PATH: /home/master/applications
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key
+          chmod 600 private_key
+          mkdir -p ~/.ssh
+          mv private_key ~/.ssh/id_rsa
+          echo -e "Host server\n\tHostName $SERVER_IP\n\tUser $SERVER_USER\n\tIdentityFile ~/.ssh/id_rsa\n\tStrictHostKeyChecking no" > ~/.ssh/config
+          rsync -avz --delete --exclude='.git' --exclude='node_modules' ./ $SERVER_USER@server:$APP_PATH
+
+      # Install dependencies and restart PM2
+    #   - name: Deploy with PM2
+    #     env:
+    #       SERVER_IP: ${{ secrets.SERVER_IP }}
+    #       SERVER_USER: ${{ secrets.SERVER_USER }}
+    #     run: |
+    #       ssh -i ~/.ssh/id_rsa $SERVER_USER@$SERVER_IP << 'EOF'
+    #         cd /home/master/applications/your-app
+    #         npm install --production
+    #         pm2 restart your-app || pm2 start npm --name your-app -- run start -- -p 3000
+    #       EOF
