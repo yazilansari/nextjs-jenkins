@@ -39,7 +39,8 @@ jobs:
         run: docker save -o nextjs-ecommerce.tar nextjs-ecommerce:latest
 
       - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nextjs-ecommerce-image
           path: nextjs-ecommerce.tar
+          retention-days: 7
